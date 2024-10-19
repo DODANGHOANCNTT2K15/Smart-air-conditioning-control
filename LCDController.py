@@ -33,7 +33,13 @@ def lcd():
                 display(lcd)
                 continue
 
-            if (time.time() - last_gpio_activity > 5):
+            if not config.status:
+                lcd.clear()
+                lcd.backlight_off()
+                config.stateAC = False
+                display(lcd)
+
+            if stateAC and (time.time() - last_gpio_activity > 5):
                 lcd.clear()
                 lcd.backlight_off()
                 config.stateAC = False
@@ -61,7 +67,7 @@ def display(lcd):
 def page_1(lcd):
     lcd.write_string(str(f"Temp: {config.temperature:.0f}°C"))
     lcd.set_cursor(1, 0)
-    lcd.write_string(str(f"Hum: {config.humidity:.0f}%"))
+    lcd.write_string(str(f"Hum: {config.cur_hum:.0f}%"))
     time.sleep(0.1)
 
 
