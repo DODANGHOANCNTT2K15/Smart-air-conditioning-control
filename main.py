@@ -4,36 +4,54 @@ from DHT22Emulator.DHT22 import readSensor
 import config
 import time
 import threading
-import time
 from voiceController import voice_control 
 from LEDController import led_threading
 from DHT22Controller import dht22
 from LCDController import lcd
 from updateConfig import update_config_file
+from connect import run_websocket_server
 
 
 def main():
+    connect_thread = threading.Thread(target=run_websocket_server)
+    connect_thread.start()
+    
     lcd_thread = threading.Thread(target=lcd)
     button_thread = threading.Thread(target=button)
     dht22_thread = threading.Thread(target=dht22)
     led_thread = threading.Thread(target=led_threading)
-
+    time_thread = threading.Thread(target=status_after_delay)
+                  
     lcd_thread.start()
     button_thread.start()
     dht22_thread.start()
     led_thread.start()
+    time_thread.start()
 
+    connect_thread.join()
     lcd_thread.join()
     button_thread.join()
     dht22_thread.join()
     led_thread.join()
+    time_thread.join()
 
-def status_after_delay(delay):
-    time.sleep(delay)
-    update_config_file('status', False)
-    update_config_file('time_set', False)
-    update_config_file('time_on', 0)
-    print("Đã tắt")
+def status_after_delay():
+    current_time = time.time()
+    while True:
+        deplay_time = config.time_on * 10
+        temp_time = time.time()
+        if config.time_on != 0 and (temp_time - current_time) > deplay_time and config.status:
+            update_config_file('time_set', False)
+            update_config_file('time_on', 0)
+            update_config_file('status', False)
+            print('da tat')
+
+        if config.time_set and (temp_time - current_time) > deplay_time and config.status:
+            update_config_file('time_set', False)
+            update_config_file('time_on', 0)
+            update_config_file('status', False)
+            print('da tat')
+        time.sleep(0.1)
 
 def button():
     GPIO.setmode(GPIO.BCM)
@@ -73,13 +91,10 @@ def button():
             time.sleep(0.5)
         if GPIO.input(14) == GPIO.LOW and config.status:
             config.time_on = (config.time_on + 1) % 13
-            update_config_file('time_on', config.time_on)  # Cập nhật vào file
+            update_config_file('time_on', config.time_on)  
             if config.time_on != 0:
-                config.time_set = True
-                update_config_file('time_set', config.time_set)
-                status_thread = threading.Thread(target=status_after_delay, args=(10 * config.time_on,))
-                status_thread.start()
-            time.sleep(0.5)
+                update_config_file('time_set', True)
+
         if GPIO.input(13) == GPIO.LOW:
             voice_control()
             time.sleep(0.5)

@@ -63,13 +63,11 @@ def display(lcd):
         case 3:
             page_4(lcd)
 
-
 def page_1(lcd):
     lcd.write_string(str(f"Temp: {config.temperature:.0f}°C"))
     lcd.set_cursor(1, 0)
     lcd.write_string(str(f"Hum: {config.cur_hum:.0f}%"))
     time.sleep(0.1)
-
 
 def page_2(lcd, mode, speed):
     lcd.write_string(str(f"Fan Speed: {config.wind_speed[speed]}"))
@@ -77,13 +75,11 @@ def page_2(lcd, mode, speed):
     lcd.write_string(str(f"Mode: {config.modes[mode]}"))
     time.sleep(0.1)
 
-
 def page_3(lcd):
     lcd.write_string(str(f"Time on: {config.time_on}"))
     lcd.set_cursor(1, 0)
     lcd.write_string(str(f"Time set: {config.time_set}"))
     time.sleep(0.1)
-
 
 def page_4(lcd):
     lcd.write_string(str(f"Now Temp: {config.cur_temp:.0f}"))

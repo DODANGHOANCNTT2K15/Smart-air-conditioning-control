@@ -67,7 +67,7 @@ async def handle_connection(websocket, path):
             # Gửi dữ liệu này về Flutter
             await websocket.send(json.dumps(config_data))
 
-            await asyncio.sleep(1)  # Gửi mỗi giây
+            await asyncio.sleep(1)  
     except websockets.ConnectionClosed:
         print("Connection closed")
 
@@ -102,5 +102,3 @@ def run_websocket_server():
     new_loop.run_until_complete(start_websocket_server())
     new_loop.run_forever()
 
-if __name__ == '__main__':
-    run_websocket_server()
